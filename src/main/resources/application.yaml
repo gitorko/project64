@@ -1,0 +1,17 @@
+spring:
+  port: 8080
+  datasource:
+    url: jdbc:postgresql://localhost:5432/demodb
+    username: demouser
+    password: demopwd
+    driver-class-name: org.postgresql.Driver
+    maximum-pool-size: 100
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL9Dialect
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+        jdbc:
+          lob:
+            non_contextual_creation: true
