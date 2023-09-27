@@ -3,7 +3,6 @@ package com.demo.project64.service;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
-import com.demo.project64.domain.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.repository.CrudRepository;
@@ -26,13 +25,13 @@ public abstract class AbstractReactiveService<T> {
         return asyncCallable(() -> getRepository().findById(id));
     }
 
-    public Mono<T> save(Customer customer) {
+    public Mono<T> save(T customer) {
         return (Mono<T>) asyncCallable(() -> getRepository().save(customer));
     }
 
-    public Mono<Void> delete(Customer customer) {
+    public Mono<Void> delete(T object) {
         return asyncCallable(() -> {
-            getRepository().delete(customer);
+            getRepository().delete(object);
             return null;
         });
     }
