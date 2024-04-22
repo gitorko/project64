@@ -3,7 +3,7 @@ package com.demo.project64;
 import java.time.Duration;
 
 import com.demo.project64.domain.Customer;
-import com.demo.project64.service.CustomerReactiveService;
+import com.demo.project64.repositoryservice.CustomerReactiveRepoService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -20,7 +20,7 @@ public class Main {
     }
 
     @Bean
-    public CommandLineRunner seedData(CustomerReactiveService customerReactiveService) {
+    public CommandLineRunner seedData(CustomerReactiveRepoService customerReactiveService) {
         return args -> {
             log.info("Seeding data!");
 

@@ -27,6 +27,16 @@ docker stop pg-container
 docker start pg-container
 ```
 
+To seed large test data
+
+```
+INSERT INTO customer (name, age)
+SELECT
+    'John',
+    30
+FROM generate_series(1, 4000000);
+```
+
 ### Dev
 
 To run the code.

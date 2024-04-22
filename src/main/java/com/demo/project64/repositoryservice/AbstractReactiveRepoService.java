@@ -1,21 +1,31 @@
-package com.demo.project64.service;
+package com.demo.project64.repositoryservice;
 
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
-public abstract class AbstractReactiveService<T> {
+public abstract class AbstractReactiveRepoService<T> {
 
     @Qualifier("jdbcScheduler")
     @Autowired
     Scheduler jdbcScheduler;
+
+    public Mono<Page<T>> findAll(Pageable pageable) {
+        return asyncCallable(() -> getRepository().findAll(pageable));
+    }
+
+    public Mono<Page<T>> findAllBlocking(Pageable pageable) {
+        return Mono.just(getRepository().findAll(pageable));
+    }
 
     public Flux<T> findAll() {
         return asyncIterable(() -> getRepository().findAll().iterator());
@@ -44,12 +54,13 @@ public abstract class AbstractReactiveService<T> {
     }
 
     protected <T> Mono<T> asyncCallable(Callable<T> callable) {
-        return Mono.fromCallable(callable).subscribeOn(Schedulers.parallel()).publishOn(jdbcScheduler);
+        return Mono.fromCallable(callable).subscribeOn(Schedulers.newParallel("jdbc-thread")).publishOn(jdbcScheduler);
     }
 
     protected <T> Flux<T> asyncIterable(Iterable<T> iterable) {
-        return Flux.fromIterable(iterable).subscribeOn(Schedulers.parallel()).publishOn(jdbcScheduler);
+        return Flux.fromIterable(iterable).subscribeOn(Schedulers.newParallel("jdbc-thread")).publishOn(jdbcScheduler);
     }
 
-    protected abstract CrudRepository getRepository();
+    protected abstract JpaRepository getRepository();
+
 }
