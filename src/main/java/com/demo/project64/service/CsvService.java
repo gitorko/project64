@@ -61,18 +61,18 @@ public class CsvService {
     private Mono<Void> generate(DownloadFile downloadFile) {
         log.info("Generating csv file!");
         Pageable pageable = PageRequest.of(0, downloadPageSize);
-        return customerReactiveRepoService.findAllBlocking(pageable)
+        return customerReactiveRepoService.findAll(pageable)
                 .flatMap(p -> this.writeHeader(downloadFile, p))
                 .flatMap(p -> this.writeContentToFile(downloadFile, p))
                 .flatMap(customerPage -> {
                     return Flux.range(1, customerPage.getTotalPages() - 1)
-                            .flatMap(index -> {
+                            .flatMapSequential(index -> {
                                 log.info("Page Index: {}", index);
                                 Pageable page = PageRequest.of(index, downloadPageSize);
-                                return customerReactiveRepoService.findAllBlocking(page);
-                            }).flatMap(pe -> {
+                                return customerReactiveRepoService.findAll(page);
+                            }, 1).flatMapSequential(pe -> {
                                 return this.writeContentToFile(downloadFile, pe);
-                            }).then();
+                            }, 1).then();
                 })
                 .then(Mono.just(downloadFile.getId()))
                 .flatMap(f -> updateStatus(f, FileWriteStatus.COMPLETED))

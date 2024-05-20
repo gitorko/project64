@@ -23,10 +23,6 @@ public abstract class AbstractReactiveRepoService<T> {
         return asyncCallable(() -> getRepository().findAll(pageable));
     }
 
-    public Mono<Page<T>> findAllBlocking(Pageable pageable) {
-        return Mono.just(getRepository().findAll(pageable));
-    }
-
     public Flux<T> findAll() {
         return asyncIterable(() -> getRepository().findAll().iterator());
     }
